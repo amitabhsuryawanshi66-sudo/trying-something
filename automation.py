@@ -6,6 +6,11 @@ from social_manager import InstagramManager
 from dotenv import load_dotenv
 
 def download_file(url, local_filename):
+    # Check if the URL is actually a local file path
+    if os.path.exists(url):
+        # Already local, just return it (or copy if necessary)
+        return url
+
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(local_filename, 'wb') as f:

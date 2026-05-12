@@ -4,3 +4,4 @@ python-dotenv
 requests
 instagrapi
 moviepy
+imageio-ffmpeg

@@ -68,7 +68,7 @@ class ContentGenerator:
         """
         prompt = (
             f"Create a plan for a short Instagram Reel about: {topic}. "
-            "Format your response exactly as follows:\n"
+            "Format your response exactly as follows and DO NOT include any other text:\n"
             "IDEA: [One sentence about the reel concept]\n"
             "SCRIPT: [A short script for the influencer to say or text to display]\n"
             "VISUAL: [A descriptive prompt for an AI video generator to create the background]"

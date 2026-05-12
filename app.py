@@ -64,8 +64,12 @@ with tab_auto:
 
         with col2:
             st.subheader("Generated Visuals")
-            st.video(res['video_url'])
-            st.write(f"[Download Video]({res['video_url']})")
+            if os.path.exists(res['video_url']):
+                with open(res['video_url'], 'rb') as v:
+                    st.video(v.read())
+            else:
+                st.video(res['video_url'])
+            st.write(f"Video ready for upload.")
 
         st.divider()
         st.subheader("Post to Social Media")
@@ -107,7 +111,11 @@ with tab_manual:
             with st.spinner("Generating..."):
                 vgen = VideoGenerator(provider=provider)
                 url = vgen.generate_video(vid_prompt)
-                st.video(url)
+                if os.path.exists(url):
+                    with open(url, 'rb') as v:
+                        st.video(v.read())
+                else:
+                    st.video(url)
                 st.write(url)
 
 st.divider()
