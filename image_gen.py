@@ -11,10 +11,7 @@ class ImageGenerator:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.client = None
         if self.provider == "openai":
-            if not self.api_key:
-                # We won't raise error here, we'll handle it in generate_image or UI
-                pass
-            else:
+            if self.api_key:
                 self.client = OpenAI(api_key=self.api_key)
 
     def generate_image(self, prompt, model="dall-e-3", size="1024x1024", quality="standard", n=1):
@@ -46,8 +43,8 @@ class ImageGenerator:
         Uses Pollinations.ai for free image generation. No API key required.
         """
         encoded_prompt = urllib.parse.quote(prompt)
-        # Pollinations.ai returns an image directly at this URL
-        image_url = f"https://pollinations.ai/p/{encoded_prompt}?width=1024&height=1024&nologo=true"
+        # Direct image link for rendering
+        image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
         return image_url
 
 if __name__ == "__main__":

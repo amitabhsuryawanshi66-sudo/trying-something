@@ -1,5 +1,6 @@
 import os
 import requests
+import urllib.parse
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -44,16 +45,9 @@ class ContentGenerator:
         Uses Pollinations.ai text API for free content generation.
         """
         try:
-            system_msg = "You are a creative social media manager for an AI influencer."
-            # Pollinations text API
-            url = f"https://text.pollinations.ai/"
-            payload = {
-                "messages": [
-                    {"role": "system", "content": system_msg},
-                    {"role": "user", "content": prompt}
-                ]
-            }
-            response = requests.post(url, json=payload)
+            encoded_prompt = urllib.parse.quote(prompt)
+            url = f"https://text.pollinations.ai/{encoded_prompt}"
+            response = requests.get(url)
             if response.status_code == 200:
                 return response.text
             else:
@@ -68,7 +62,20 @@ class ContentGenerator:
         prompt = f"Create an engaging Instagram caption with hashtags for an image described as: {description}"
         return self.generate_content(prompt)
 
+    def generate_reel_plan(self, topic):
+        """
+        Brainstorms a reel plan: Idea, Script, and Visual Prompt.
+        """
+        prompt = (
+            f"Create a plan for a short Instagram Reel about: {topic}. "
+            "Format your response exactly as follows:\n"
+            "IDEA: [One sentence about the reel concept]\n"
+            "SCRIPT: [A short script for the influencer to say or text to display]\n"
+            "VISUAL: [A descriptive prompt for an AI video generator to create the background]"
+        )
+        return self.generate_content(prompt)
+
 if __name__ == "__main__":
     # Quick test
     gen = ContentGenerator(provider="free")
-    print(f"Free content: {gen.generate_caption('A stylish AI influencer')}")
+    print(f"Free Reel Plan: {gen.generate_reel_plan('Healthy habits')}")
