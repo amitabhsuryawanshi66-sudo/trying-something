@@ -4,15 +4,17 @@ from social_manager import SocialManager
 from dotenv import load_dotenv
 import os
 
-def run_automation(prompt):
+def run_automation(prompt, provider="free"):
     load_dotenv()
 
+    api_key = os.getenv("OPENAI_API_KEY")
+
     # Initialize components
-    image_gen = ImageGenerator()
-    content_gen = ContentGenerator()
+    image_gen = ImageGenerator(api_key=api_key, provider=provider)
+    content_gen = ContentGenerator(api_key=api_key, provider=provider)
     social_mgr = SocialManager()
 
-    print(f"--- Starting Automation for prompt: {prompt} ---")
+    print(f"--- Starting Automation for prompt: {prompt} (Mode: {provider}) ---")
 
     # 1. Generate Image
     print("Generating image...")
@@ -38,7 +40,8 @@ def run_automation(prompt):
 
 if __name__ == "__main__":
     test_prompt = "An AI influencer drinking coffee in a futuristic cafe"
-    results = run_automation(test_prompt)
+    # Default to free for CLI test too
+    results = run_automation(test_prompt, provider="free")
     print("\nFinal Results:")
     for key, value in results.items():
         print(f"{key}: {value}")

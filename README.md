@@ -1,56 +1,48 @@
 # AI Influencer Automation System 🤖
 
-This project is a beginner-friendly, modular Python system for automating an AI influencer's workflow. It includes image generation, caption generation, and social media automation structures.
+This project is a beginner-friendly, modular Python system for automating an AI influencer's workflow.
 
-## 🌟 Features
-- **Image Generation:** Uses OpenAI's DALL-E 3 to create high-quality influencer photos.
-- **Content Generation:** Uses OpenAI's GPT-4o to write engaging social media captions.
-- **Social Media Management:** Modular structure to simulate or automate posting to Instagram and Twitter.
-- **Easy-to-use Web UI:** A simple clickable interface built with Streamlit.
+## 🌟 New Feature: Idea-to-Reel Automation
+You can now enter a simple topic (e.g., "Why I love coding") and the system will:
+1. **Brainstorm** a unique Reel idea.
+2. **Write** a script for the post.
+3. **Generate** a background video.
+4. **Post** it directly to your Instagram account.
 
 ---
 
 ## 🚀 Beginner Setup Guide (No coding required!)
 
 ### 1. Prerequisites
-- You need **Python** installed on your Windows computer. If you don't have it, download and install it from [python.org](https://www.python.org/downloads/). (Make sure to check the box "Add Python to PATH" during installation).
-- You need an **OpenAI API Key**. Get one from [platform.openai.com](https://platform.openai.com/).
+- You need **Python** installed. Download from [python.org](https://www.python.org/downloads/). (Check "Add Python to PATH").
 
 ### 2. Installation
-1. Download or clone this repository to your computer.
-2. Open the folder and find the file named `setup.bat`.
-3. **Double-click `setup.bat`**. This will automatically:
-   - Create a virtual environment (a private space for this project's dependencies).
-   - Install all necessary libraries (Streamlit, OpenAI, etc.).
-   - Create a `.env` file for your configuration.
+1. Download or clone this repository.
+2. **Double-click `setup.bat`**. This installs everything needed (Streamlit, Instagrapi, etc.).
 
-### 3. Configuration (Adding your API Key)
-1. In the same folder, look for a file named `.env`.
-2. Right-click `.env` and select **Open with > Notepad**.
-3. Find the line that says: `OPENAI_API_KEY=your_openai_api_key_here`.
-4. Replace `your_openai_api_key_here` with your actual API key from OpenAI.
-5. **Save** the file (Ctrl+S) and close Notepad.
+### 3. Running the App
+1. **Double-click `run_app.bat`**.
+2. The browser UI will open.
+3. Enter your **Instagram Username** and **Password** in the sidebar if you want to use the automated posting feature.
+4. Go to the **"Full Automation"** tab, enter a topic, and click **"Start Full Automation"**.
 
-### 4. Running the App
-1. Find the file named `run_app.bat`.
-2. **Double-click `run_app.bat`**.
-3. A terminal window will open, and shortly after, a new tab will open in your web browser with the app interface.
-4. If the browser doesn't open automatically, look for a URL like `http://localhost:8501` in the terminal and copy-paste it into your browser.
+### 4. Configuration (API Keys)
+- **Free Mode:** Default. No keys needed. Uses Pollinations.ai for everything.
+- **Premium Mode:** Add your `OPENAI_API_KEY` to the `.env` file to use DALL-E 3 and GPT-4o.
 
 ---
 
-## 🛠 Project Structure (For Developers)
-
-- `app.py`: The Streamlit web interface.
-- `main.py`: Orchestrator for the generation pipeline.
-- `image_gen.py`: Handles DALL-E 3 API calls.
-- `content_gen.py`: Handles GPT-4o API calls.
-- `social_manager.py`: Logic for social media posting.
-- `requirements.txt`: List of Python dependencies.
-- `.env.example`: Template for environment variables.
-- `setup.bat` / `run_app.bat`: Automation scripts for Windows.
+## 🛠 Project Structure
+- `app.py`: Streamlit Web UI.
+- `automation.py`: Orchestrator for the "Idea to Post" pipeline.
+- `social_manager.py`: Handles Instagram login and Reel uploads via `instagrapi`.
+- `video_gen.py`: Generates videos using AI.
+- `image_gen.py` / `content_gen.py`: Core generators.
 
 ---
+
+## ⚠️ Important Note
+Automating social media accounts can sometimes lead to temporary blocks or bans if used excessively. Use this tool responsibly and moderate the frequency of your automated posts.
 
 ## 📝 License
-This project is open-source. Feel free to modify and adapt it for your own AI influencer projects!
+Open-source. Adapt it for your AI influencer journey!
