@@ -3,8 +3,8 @@
 This project is a beginner-friendly, modular Python system for automating an AI influencer's workflow. It includes image generation, caption generation, and social media automation structures.
 
 ## 🌟 Features
-- **Image Generation:** Uses OpenAI's DALL-E 3 to create high-quality influencer photos.
-- **Content Generation:** Uses OpenAI's GPT-4o to write engaging social media captions.
+- **Free Mode (New!):** Use powerful AI generation for **FREE** without needing an OpenAI API key.
+- **OpenAI Integration:** Optionally use OpenAI's DALL-E 3 and GPT-4o for premium quality.
 - **Social Media Management:** Modular structure to simulate or automate posting to Instagram and Twitter.
 - **Easy-to-use Web UI:** A simple clickable interface built with Streamlit.
 
@@ -14,7 +14,6 @@ This project is a beginner-friendly, modular Python system for automating an AI 
 
 ### 1. Prerequisites
 - You need **Python** installed on your Windows computer. If you don't have it, download and install it from [python.org](https://www.python.org/downloads/). (Make sure to check the box "Add Python to PATH" during installation).
-- You need an **OpenAI API Key**. Get one from [platform.openai.com](https://platform.openai.com/).
 
 ### 2. Installation
 1. Download or clone this repository to your computer.
@@ -24,30 +23,30 @@ This project is a beginner-friendly, modular Python system for automating an AI 
    - Install all necessary libraries (Streamlit, OpenAI, etc.).
    - Create a `.env` file for your configuration.
 
-### 3. Configuration (Adding your API Key)
-1. In the same folder, look for a file named `.env`.
-2. Right-click `.env` and select **Open with > Notepad**.
-3. Find the line that says: `OPENAI_API_KEY=your_openai_api_key_here`.
-4. Replace `your_openai_api_key_here` with your actual API key from OpenAI.
-5. **Save** the file (Ctrl+S) and close Notepad.
-
-### 4. Running the App
+### 3. Running the App (Free Mode)
 1. Find the file named `run_app.bat`.
 2. **Double-click `run_app.bat`**.
 3. A terminal window will open, and shortly after, a new tab will open in your web browser with the app interface.
-4. If the browser doesn't open automatically, look for a URL like `http://localhost:8501` in the terminal and copy-paste it into your browser.
+4. By default, the app is set to **"Free (No API Key)"**. You can start generating content immediately by entering a prompt!
+
+### 4. Optional: Premium Mode (OpenAI)
+If you want to use OpenAI's paid services:
+1. Get an API key from [platform.openai.com](https://platform.openai.com/).
+2. In the project folder, right-click the `.env` file and select **Open with > Notepad**.
+3. Replace `your_openai_api_key_here` with your actual API key.
+4. Save the file.
+5. In the web app, switch the "Operation Mode" in the sidebar to **"OpenAI (Paid API Key)"**.
 
 ---
 
 ## 🛠 Project Structure (For Developers)
 
-- `app.py`: The Streamlit web interface.
+- `app.py`: The Streamlit web interface (Supports Free and OpenAI modes).
 - `main.py`: Orchestrator for the generation pipeline.
-- `image_gen.py`: Handles DALL-E 3 API calls.
-- `content_gen.py`: Handles GPT-4o API calls.
+- `image_gen.py`: Handles generation (Pollinations or DALL-E 3).
+- `content_gen.py`: Handles text generation (Pollinations or GPT-4o).
 - `social_manager.py`: Logic for social media posting.
 - `requirements.txt`: List of Python dependencies.
-- `.env.example`: Template for environment variables.
 - `setup.bat` / `run_app.bat`: Automation scripts for Windows.
 
 ---
