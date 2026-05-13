@@ -1,6 +1,8 @@
 streamlit
 openai
+groq
 python-dotenv
 requests
 instagrapi
 moviepy
+imageio-ffmpeg
