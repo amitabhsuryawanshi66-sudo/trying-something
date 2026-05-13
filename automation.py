@@ -42,9 +42,8 @@ def run_reel_automation(topic, provider="free"):
     video_url = video_gen.generate_video(plan['visual'])
 
     # 3. Prepare for download (needed for posting)
-    local_video = f"reel_{topic.replace(' ', '_')}.mp4"
-    # Note: Downloading might fail if the URL isn't immediately ready or valid
-    # In a real app, we'd add retries
+    # The video_url might already be a local path from our generator
+    local_video = video_url if os.path.exists(video_url) else f"reel_{topic.replace(' ', '_')}.mp4"
 
     return {
         "plan": plan,

@@ -66,7 +66,14 @@ with tab_auto:
             st.subheader("Generated Visuals")
             if os.path.exists(res['video_url']):
                 with open(res['video_url'], 'rb') as v:
-                    st.video(v.read())
+                    video_bytes = v.read()
+                    st.video(video_bytes)
+                    st.download_button(
+                        label="⬇️ Download Reel (MP4)",
+                        data=video_bytes,
+                        file_name=os.path.basename(res['video_url']),
+                        mime="video/mp4"
+                    )
             else:
                 st.video(res['video_url'])
             st.write(f"Video ready for upload.")
@@ -113,7 +120,14 @@ with tab_manual:
                 url = vgen.generate_video(vid_prompt)
                 if os.path.exists(url):
                     with open(url, 'rb') as v:
-                        st.video(v.read())
+                        video_bytes = v.read()
+                        st.video(video_bytes)
+                        st.download_button(
+                            label="⬇️ Download Video (MP4)",
+                            data=video_bytes,
+                            file_name=os.path.basename(url),
+                            mime="video/mp4"
+                        )
                 else:
                     st.video(url)
                 st.write(url)
