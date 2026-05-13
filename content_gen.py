@@ -1,34 +1,48 @@
 import os
 import requests
 import urllib.parse
+import re
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class ContentGenerator:
-    def __init__(self, api_key=None, provider="free"):
-        self.provider = provider
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self.client = None
-        if self.provider == "openai":
-            if self.api_key:
-                self.client = OpenAI(api_key=self.api_key)
+    def __init__(self, api_key=None, provider="pollinations", groq_key=None):
+        self.provider = provider.lower()
+        self.openai_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.groq_key = groq_key or os.getenv("GROQ_API_KEY")
 
-    def generate_content(self, prompt, model="gpt-4o", max_tokens=500):
+        self.openai_client = None
+        if self.provider == "openai" and self.openai_key:
+            self.openai_client = OpenAI(api_key=self.openai_key)
+
+        self.groq_client = None
+        if self.provider == "groq" and self.groq_key:
+            try:
+                from groq import Groq
+                self.groq_client = Groq(api_key=self.groq_key)
+            except ImportError:
+                print("Groq library not found. Please install with 'pip install groq'.")
+
+    def generate_content(self, prompt, model=None, max_tokens=500):
         """
-        Generates text content. Supports 'openai' and 'free' (Pollinations.ai text API).
+        Generates text content. Supports 'openai', 'groq', and 'pollinations'.
         """
         if self.provider == "openai":
-            return self._generate_openai(prompt, model, max_tokens)
+            return self._generate_openai(prompt, model or "gpt-4o", max_tokens)
+        elif self.provider == "groq":
+            return self._generate_groq(prompt, model or "llama3-8b-8192", max_tokens)
+        elif self.provider == "pollinations":
+            return self._generate_pollinations(prompt)
         else:
-            return self._generate_free(prompt)
+            return self._generate_template(prompt)
 
     def _generate_openai(self, prompt, model, max_tokens):
-        if not self.client:
+        if not self.openai_client:
             return "Error: OpenAI client not initialized. Check your API key."
         try:
-            response = self.client.chat.completions.create(
+            response = self.openai_client.chat.completions.create(
                 model=model,
                 messages=[
                     {"role": "system", "content": "You are a creative social media manager for an AI influencer."},
@@ -38,9 +52,25 @@ class ContentGenerator:
             )
             return response.choices[0].message.content
         except Exception as e:
-            return f"An error occurred with OpenAI: {e}"
+            return f"OpenAI Error: {e}"
 
-    def _generate_free(self, prompt):
+    def _generate_groq(self, prompt, model, max_tokens):
+        if not self.groq_client:
+            return "Error: Groq client not initialized. Check your API key."
+        try:
+            chat_completion = self.groq_client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": "You are a creative social media manager for an AI influencer."},
+                    {"role": "user", "content": prompt}
+                ],
+                model=model,
+                max_tokens=max_tokens
+            )
+            return chat_completion.choices[0].message.content
+        except Exception as e:
+            return f"Groq Error: {e}"
+
+    def _generate_pollinations(self, prompt):
         """
         Uses Pollinations.ai text API for free content generation.
         """
@@ -51,16 +81,41 @@ class ContentGenerator:
             if response.status_code == 200:
                 return response.text
             else:
-                return f"Error from free service: {response.status_code}"
+                return f"Pollinations Error: {response.status_code}"
         except Exception as e:
-            return f"An error occurred with free service: {e}"
+            return f"Pollinations Connection Error: {e}"
 
-    def generate_caption(self, description):
+    def _generate_template(self, prompt):
         """
-        Helper to generate a social media caption based on an image description.
+        Fallback template generator if no AI is available.
         """
-        prompt = f"Create an engaging Instagram caption with hashtags for an image described as: {description}"
-        return self.generate_content(prompt)
+        if "Reel" in prompt or "plan" in prompt:
+            return (
+                "IDEA: A day in the life of an AI creator.\n"
+                "SCRIPT: Behind every pixel is a line of code. Welcome to my world.\n"
+                "VISUAL: A clean, futuristic workspace with holographic screens."
+            )
+        return "Enjoying the digital frontier! #AI #TechLife"
+
+    def parse_reel_plan(self, text):
+        """
+        Robustly parses the plan using regex.
+        """
+        plan = {
+            "idea": "Unique AI content creation.",
+            "script": "Check out this amazing AI-generated content!",
+            "visual": "A futuristic digital landscape."
+        }
+
+        idea_match = re.search(r"IDEA:\s*(.*)", text, re.IGNORECASE)
+        script_match = re.search(r"SCRIPT:\s*(.*)", text, re.IGNORECASE)
+        visual_match = re.search(r"VISUAL:\s*(.*)", text, re.IGNORECASE)
+
+        if idea_match: plan["idea"] = idea_match.group(1).strip()
+        if script_match: plan["script"] = script_match.group(1).strip()
+        if visual_match: plan["visual"] = visual_match.group(1).strip()
+
+        return plan
 
     def generate_reel_plan(self, topic):
         """
@@ -68,14 +123,14 @@ class ContentGenerator:
         """
         prompt = (
             f"Create a plan for a short Instagram Reel about: {topic}. "
-            "Format your response exactly as follows and DO NOT include any other text:\n"
-            "IDEA: [One sentence about the reel concept]\n"
-            "SCRIPT: [A short script for the influencer to say or text to display]\n"
-            "VISUAL: [A descriptive prompt for an AI video generator to create the background]"
+            "Respond ONLY with this format:\n"
+            "IDEA: [One sentence idea]\n"
+            "SCRIPT: [Short script or overlay text]\n"
+            "VISUAL: [Descriptive prompt for an image generator]"
         )
-        return self.generate_content(prompt)
+        content = self.generate_content(prompt)
+        return self.parse_reel_plan(content)
 
 if __name__ == "__main__":
-    # Quick test
-    gen = ContentGenerator(provider="free")
-    print(f"Free Reel Plan: {gen.generate_reel_plan('Healthy habits')}")
+    gen = ContentGenerator(provider="pollinations")
+    print(f"Test Plan: {gen.generate_reel_plan('Morning routine')}")

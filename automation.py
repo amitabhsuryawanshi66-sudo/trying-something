@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 def download_file(url, local_filename):
     # Check if the URL is actually a local file path
     if os.path.exists(url):
-        # Already local, just return it (or copy if necessary)
+        # Already local, just return it
         return url
 
     with requests.get(url, stream=True) as r:
@@ -18,27 +18,18 @@ def download_file(url, local_filename):
                 f.write(chunk)
     return local_filename
 
-def run_reel_automation(topic, provider="free"):
+def run_reel_automation(topic, provider="pollinations", openai_key=None, groq_key=None):
     load_dotenv()
 
     # 1. Idea & Script Generation
-    print(f"Generating plan for topic: {topic}...")
-    content_gen = ContentGenerator(provider=provider)
-    plan_raw = content_gen.generate_reel_plan(topic)
-
-    # Parse the plan
-    plan = {}
-    for line in plan_raw.split('\n'):
-        if line.startswith('IDEA:'): plan['idea'] = line.replace('IDEA:', '').strip()
-        if line.startswith('SCRIPT:'): plan['script'] = line.replace('SCRIPT:', '').strip()
-        if line.startswith('VISUAL:'): plan['visual'] = line.replace('VISUAL:', '').strip()
-
-    if not plan.get('visual'):
-        plan['visual'] = topic # Fallback
+    print(f"Generating plan for topic: {topic} using {provider}...")
+    content_gen = ContentGenerator(api_key=openai_key, provider=provider, groq_key=groq_key)
+    plan = content_gen.generate_reel_plan(topic)
 
     # 2. Visual Generation
     print("Generating video...")
-    video_gen = VideoGenerator(provider=provider)
+    # For now, video_gen primarily uses 'free' mode for the image-to-video pipeline
+    video_gen = VideoGenerator(provider="free")
     video_url = video_gen.generate_video(plan['visual'])
 
     # 3. Prepare for download (needed for posting)
@@ -52,5 +43,6 @@ def run_reel_automation(topic, provider="free"):
     }
 
 if __name__ == "__main__":
+    # Test with default pollinations
     results = run_reel_automation("Morning routine of an AI")
     print(f"Automation results: {results}")

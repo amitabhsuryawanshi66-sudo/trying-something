@@ -18,13 +18,18 @@ load_dotenv()
 
 # Sidebar
 st.sidebar.header("Global Settings")
-mode = st.sidebar.radio("Operation Mode", ["Free (No API Key)", "OpenAI (Paid API Key)"], index=0)
-provider = "free" if "Free" in mode else "openai"
+provider_choice = st.sidebar.selectbox(
+    "Text AI Provider",
+    ["Pollinations (Free, No Key)", "Groq (Free, Needs Key)", "OpenAI (Paid, Needs Key)"]
+)
 
-api_key = os.getenv("OPENAI_API_KEY")
-if provider == "openai" and not api_key:
-    st.sidebar.warning("⚠️ OpenAI API Key missing.")
-    api_key = st.sidebar.text_input("Enter OpenAI Key:", type="password")
+provider = "pollinations"
+if "Groq" in provider_choice: provider = "groq"
+if "OpenAI" in provider_choice: provider = "openai"
+
+# API Keys
+openai_key = st.sidebar.text_input("OpenAI API Key", value=os.getenv("OPENAI_API_KEY", ""), type="password")
+groq_key = st.sidebar.text_input("Groq API Key", value=os.getenv("GROQ_API_KEY", ""), type="password")
 
 st.sidebar.divider()
 st.sidebar.header("Instagram Credentials")
@@ -36,17 +41,26 @@ tab_auto, tab_manual = st.tabs(["🚀 Full Automation (Topic to Reel)", "🛠 Ma
 
 with tab_auto:
     st.header("One-Click AI Reel Creator")
-    st.write("Enter a topic and let the AI do everything: brainstorm the idea, write the script, generate the video, and post it.")
+    st.write(f"Using **{provider_choice}** to generate ideas.")
 
     topic = st.text_input("Topic for your Reel", placeholder="e.g., A day in the life of a digital artist")
 
     if st.button("🌟 Start Full Automation"):
         if not topic:
             st.error("Please enter a topic.")
+        elif provider == "openai" and not openai_key:
+            st.error("Please provide an OpenAI API Key.")
+        elif provider == "groq" and not groq_key:
+            st.error("Please provide a Groq API Key.")
         else:
-            with st.spinner("Brainstorming, generating, and preparing..."):
+            with st.spinner(f"Brainstorming with {provider}..."):
                 try:
-                    results = run_reel_automation(topic, provider=provider)
+                    results = run_reel_automation(
+                        topic,
+                        provider=provider,
+                        openai_key=openai_key,
+                        groq_key=groq_key
+                    )
                     st.session_state['auto_results'] = results
                     st.success("Automation sequence complete!")
                 except Exception as e:
@@ -86,9 +100,7 @@ with tab_auto:
             else:
                 with st.spinner("Uploading to Instagram..."):
                     try:
-                        # 1. Download
                         local_path = download_file(res['video_url'], res['local_video'])
-                        # 2. Upload
                         im = InstagramManager(ig_user, ig_pass)
                         caption = f"{res['plan'].get('idea')}\n\n{res['plan'].get('script')}\n\n#AI #Influencer #Reel"
                         status = im.upload_reel(local_path, caption)
@@ -104,9 +116,10 @@ with tab_manual:
     with col_img:
         st.subheader("Image Generator")
         img_prompt = st.text_area("Image Prompt")
+        img_prov = "openai" if provider == "openai" else "free"
         if st.button("🖼 Generate Image"):
             with st.spinner("Generating..."):
-                igen = ImageGenerator(api_key=api_key, provider=provider)
+                igen = ImageGenerator(api_key=openai_key, provider=img_prov)
                 url = igen.generate_image(img_prompt)
                 st.image(url)
                 st.write(url)
@@ -116,7 +129,7 @@ with tab_manual:
         vid_prompt = st.text_area("Video Prompt")
         if st.button("🎬 Generate Video"):
             with st.spinner("Generating..."):
-                vgen = VideoGenerator(provider=provider)
+                vgen = VideoGenerator(provider="free")
                 url = vgen.generate_video(vid_prompt)
                 if os.path.exists(url):
                     with open(url, 'rb') as v:
