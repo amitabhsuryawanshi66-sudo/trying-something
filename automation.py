@@ -24,16 +24,28 @@ def run_reel_automation(topic, provider="pollinations", openai_key=None, groq_ke
     # 1. Idea & Script Generation
     print(f"Generating plan for topic: {topic} using {provider}...")
     content_gen = ContentGenerator(api_key=openai_key, provider=provider, groq_key=groq_key)
-    plan = content_gen.generate_reel_plan(topic)
+
+    # Get structured ideas
+    ideas = content_gen.generate_ideas(topic, count=1)
+    if not ideas:
+        # Fallback to simple plan if niche logic fails
+        plan = content_gen.generate_reel_plan(topic)
+    else:
+        idea = ideas[0]
+        script = content_gen.generate_script(idea.get('title', topic), topic)
+        visuals = idea.get('visuals', topic)
+        plan = {
+            "idea": idea.get('title', topic),
+            "script": script,
+            "visual": visuals
+        }
 
     # 2. Visual Generation
     print("Generating video...")
-    # For now, video_gen primarily uses 'free' mode for the image-to-video pipeline
     video_gen = VideoGenerator(provider="free")
     video_url = video_gen.generate_video(plan['visual'])
 
-    # 3. Prepare for download (needed for posting)
-    # The video_url might already be a local path from our generator
+    # 3. Prepare local path
     local_video = video_url if os.path.exists(video_url) else f"reel_{topic.replace(' ', '_')}.mp4"
 
     return {
@@ -43,6 +55,5 @@ def run_reel_automation(topic, provider="pollinations", openai_key=None, groq_ke
     }
 
 if __name__ == "__main__":
-    # Test with default pollinations
-    results = run_reel_automation("Morning routine of an AI")
+    results = run_reel_automation("Minecraft parkour")
     print(f"Automation results: {results}")

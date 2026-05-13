@@ -2,6 +2,7 @@ import os
 import requests
 import urllib.parse
 import re
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -25,7 +26,7 @@ class ContentGenerator:
             except ImportError:
                 print("Groq library not found. Please install with 'pip install groq'.")
 
-    def generate_content(self, prompt, model=None, max_tokens=500):
+    def generate_content(self, prompt, model=None, max_tokens=1000):
         """
         Generates text content. Supports 'openai', 'groq', and 'pollinations'.
         """
@@ -45,7 +46,7 @@ class ContentGenerator:
             response = self.openai_client.chat.completions.create(
                 model=model,
                 messages=[
-                    {"role": "system", "content": "You are a creative social media manager for an AI influencer."},
+                    {"role": "system", "content": "You are a creative social media manager for an AI influencer and faceless content creator."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=max_tokens
@@ -60,7 +61,7 @@ class ContentGenerator:
         try:
             chat_completion = self.groq_client.chat.completions.create(
                 messages=[
-                    {"role": "system", "content": "You are a creative social media manager for an AI influencer."},
+                    {"role": "system", "content": "You are a creative social media manager for an AI influencer and faceless content creator."},
                     {"role": "user", "content": prompt}
                 ],
                 model=model,
@@ -89,48 +90,87 @@ class ContentGenerator:
         """
         Fallback template generator if no AI is available.
         """
-        if "Reel" in prompt or "plan" in prompt:
-            return (
-                "IDEA: A day in the life of an AI creator.\n"
-                "SCRIPT: Behind every pixel is a line of code. Welcome to my world.\n"
-                "VISUAL: A clean, futuristic workspace with holographic screens."
-            )
+        prompt_lower = prompt.lower()
+        if "ideas" in prompt_lower:
+            if "minecraft" in prompt_lower:
+                return "TITLE: Minecraft Parkour Brainrot\nHOOK: Why are you still watching this?\nANGLE: Fast-paced parkour with satisfying sounds.\nTRIGGER: Visual satisfaction\nCTA: Follow for more satisfying clips.\nMONETIZATION: Selling custom parkour maps.\nVISUALS: High-speed Minecraft parkour in the End."
+            elif "self-improvement" in prompt_lower or "discipline" in prompt_lower:
+                return "TITLE: The 5 AM Rule\nHOOK: 99% of people fail this.\nANGLE: Discipline over motivation.\nTRIGGER: FOMO (Fear Of Missing Out) on success.\nCTA: Type 'READY' if you're starting today.\nMONETIZATION: Coaching program.\nVISUALS: Dark cinematic shots of someone working out early."
+            elif "money" in prompt_lower or "side hustle" in prompt_lower:
+                return "TITLE: Student Side Hustle\nHOOK: Make $100/day using only your phone.\nANGLE: Easy entry for students.\nTRIGGER: Financial freedom\nCTA: Check the link in bio for the full tutorial.\nMONETIZATION: Affiliate marketing.\nVISUALS: Split screen with phone screen recording and aesthetic office."
+
+        if "script" in prompt_lower:
+            return "0:00 - VO: You've been lied to about success. TEXT: THE SUCCESS LIE. VISUAL: Cinematic slow motion of rain.\n0:05 - VO: It's not about talent, it's about discipline. TEXT: DISCIPLINE > TALENT. VISUAL: Fast cuts of intense training.\n0:15 - VO: Start today, not tomorrow. TEXT: START NOW. VISUAL: Motivational quote on dark background."
+
         return "Enjoying the digital frontier! #AI #TechLife"
 
-    def parse_reel_plan(self, text):
-        """
-        Robustly parses the plan using regex.
-        """
-        plan = {
-            "idea": "Unique AI content creation.",
-            "script": "Check out this amazing AI-generated content!",
-            "visual": "A futuristic digital landscape."
-        }
-
-        idea_match = re.search(r"IDEA:\s*(.*)", text, re.IGNORECASE)
-        script_match = re.search(r"SCRIPT:\s*(.*)", text, re.IGNORECASE)
-        visual_match = re.search(r"VISUAL:\s*(.*)", text, re.IGNORECASE)
-
-        if idea_match: plan["idea"] = idea_match.group(1).strip()
-        if script_match: plan["script"] = script_match.group(1).strip()
-        if visual_match: plan["visual"] = visual_match.group(1).strip()
-
-        return plan
-
-    def generate_reel_plan(self, topic):
-        """
-        Brainstorms a reel plan: Idea, Script, and Visual Prompt.
-        """
+    def generate_ideas(self, niche, count=3):
         prompt = (
-            f"Create a plan for a short Instagram Reel about: {topic}. "
-            "Respond ONLY with this format:\n"
-            "IDEA: [One sentence idea]\n"
-            "SCRIPT: [Short script or overlay text]\n"
-            "VISUAL: [Descriptive prompt for an image generator]"
+            f"Generate {count} viral content ideas for a faceless {niche} channel. "
+            "For each idea, provide exactly these fields:\n"
+            "TITLE: [Catchy title]\n"
+            "HOOK: [First 3-second hook]\n"
+            "ANGLE: [Unique video perspective]\n"
+            "TRIGGER: [Emotional trigger like FOMO, curiosity, anger, or joy]\n"
+            "CTA: [Call to action]\n"
+            "MONETIZATION: [How to make money from this video]\n"
+            "VISUALS: [Suggested visuals for Minecraft parkour or aesthetic b-roll]\n"
+            "---"
         )
         content = self.generate_content(prompt)
-        return self.parse_reel_plan(content)
+        ideas_raw = content.split("---")
+        ideas = []
+        for raw in ideas_raw:
+            if raw.strip():
+                idea = {}
+                for line in raw.strip().split('\n'):
+                    if ':' in line:
+                        key, val = line.split(':', 1)
+                        idea[key.strip().lower()] = val.strip()
+                if idea:
+                    ideas.append(idea)
+        return ideas
+
+    def generate_script(self, idea_title, niche):
+        prompt = (
+            f"Write a 15-45 second short-form video script for the idea: '{idea_title}' in the {niche} niche. "
+            "Format exactly like this for each segment:\n"
+            "TIMESTAMP - VO: [Voiceover text] TEXT: [On-screen text] VISUAL: [Visual direction]\n"
+            "Keep it fast-paced and high-retention."
+        )
+        return self.generate_content(prompt)
+
+    def generate_metadata(self, idea_title, niche):
+        prompt = (
+            f"Generate captions and hashtags for a video titled '{idea_title}' in the {niche} niche.\n"
+            "TikTok Caption: [Text]\n"
+            "YouTube Shorts Title: [Text]\n"
+            "Instagram Reel Caption: [Text]\n"
+            "Hashtags: [#tag1 #tag2 ...]\n"
+            "Pinned Comment: [Text]\n"
+            "CTA: [Text]"
+        )
+        return self.generate_content(prompt)
+
+    def generate_visual_prompts(self, visual_description):
+        prompt = (
+            f"Convert this visual description into 3 detailed AI image/video generation prompts (Minecraft-inspired, voxel, or cinematic b-roll, no copyrighted names): '{visual_description}'"
+        )
+        return self.generate_content(prompt)
+
+    def generate_reel_plan(self, topic):
+        # Keeping for backward compatibility but using the new structure
+        ideas = self.generate_ideas(topic, count=1)
+        if ideas:
+            idea = ideas[0]
+            script = self.generate_script(idea.get('title', topic), topic)
+            return {
+                "idea": idea.get('title', topic),
+                "script": script,
+                "visual": idea.get('visuals', topic)
+            }
+        return {"idea": topic, "script": "N/A", "visual": topic}
 
 if __name__ == "__main__":
     gen = ContentGenerator(provider="pollinations")
-    print(f"Test Plan: {gen.generate_reel_plan('Morning routine')}")
+    print(f"Test Ideas: {gen.generate_ideas('Minecraft brainrot', count=2)}")
