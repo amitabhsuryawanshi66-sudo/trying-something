@@ -69,9 +69,28 @@ with tab_dash:
 
         if st.button("💡 Generate Ideas"):
             with st.spinner("Thinking of viral hits..."):
-                ideas = content_gen.generate_ideas(niche, count)
-                st.session_state['generated_ideas'] = ideas
-                st.session_state['current_niche'] = niche
+                try:
+                    ideas = content_gen.generate_ideas(niche, count)
+                    st.session_state['generated_ideas'] = ideas
+                    st.session_state['current_niche'] = niche
+                    st.session_state['raw_debug'] = content_gen.last_raw_response
+                    st.session_state['parse_errors'] = content_gen.last_parse_errors
+                except Exception as e:
+                    st.error(f"Generation failed: {e}. Using template fallback.")
+                    # Manual fallback
+                    ideas = json.loads(content_gen._generate_template("ideas"))["ideas"]
+                    st.session_state['generated_ideas'] = ideas
+
+    # Debug Section
+    with st.expander("🛠 Debug Info (Raw AI Output)"):
+        if 'raw_debug' in st.session_state:
+            st.code(st.session_state['raw_debug'], language="json")
+            if st.session_state.get('parse_errors'):
+                st.warning("Parse Logs:")
+                for err in st.session_state['parse_errors']:
+                    st.write(f"- {err}")
+        else:
+            st.write("No generation yet.")
 
     if 'generated_ideas' in st.session_state:
         st.subheader(f"Top {len(st.session_state['generated_ideas'])} Ideas for {st.session_state['current_niche']}")
@@ -133,6 +152,28 @@ with tab_dash:
 
             csv_data = pd.DataFrame([pkg['idea']]).to_csv(index=False)
             st.download_button("📥 Export CSV", csv_data, file_name=f"{pkg['idea']['title'].replace(' ', '_')}.csv")
+
+            st.divider()
+            st.subheader("🚀 One-Click Visual & Post")
+            if st.button("🎬 Generate Video & Upload to IG"):
+                if not ig_user or not ig_pass:
+                    st.error("Please provide Instagram credentials in the sidebar.")
+                else:
+                    with st.spinner("Generating video clip..."):
+                        vgen = VideoGenerator(provider="free")
+                        video_path = vgen.generate_video(pkg['idea']['visuals'])
+                        if os.path.exists(video_path):
+                            st.video(video_path)
+                            with st.spinner("Uploading to Instagram..."):
+                                try:
+                                    im = InstagramManager(ig_user, ig_pass)
+                                    caption = f"{pkg['idea']['title']}\n\n{pkg['idea']['hook']}\n\n#AI #Faceless #Content"
+                                    status = im.upload_reel(video_path, caption)
+                                    st.success(status)
+                                except Exception as e:
+                                    st.error(f"Upload failed: {e}")
+                        else:
+                            st.error("Video generation failed.")
 
 with tab_tracker:
     st.header("📅 Content Management")

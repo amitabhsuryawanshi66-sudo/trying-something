@@ -14,6 +14,9 @@ class ContentGenerator:
         self.openai_key = api_key or os.getenv("OPENAI_API_KEY")
         self.groq_key = groq_key or os.getenv("GROQ_API_KEY")
 
+        self.last_raw_response = ""
+        self.last_parse_errors = []
+
         self.openai_client = None
         if self.provider == "openai" and self.openai_key:
             self.openai_client = OpenAI(api_key=self.openai_key)
@@ -22,34 +25,40 @@ class ContentGenerator:
         if self.provider == "groq" and self.groq_key:
             try:
                 from groq import Groq
+                # Using a more reliable model for JSON
+                self.groq_model = "llama-3.3-70b-versatile"
                 self.groq_client = Groq(api_key=self.groq_key)
             except ImportError:
                 print("Groq library not found. Please install with 'pip install groq'.")
 
-    def generate_content(self, prompt, model=None, max_tokens=1000):
+    def generate_content(self, prompt, model=None, max_tokens=1500):
         """
         Generates text content. Supports 'openai', 'groq', and 'pollinations'.
         """
         if self.provider == "openai":
-            return self._generate_openai(prompt, model or "gpt-4o", max_tokens)
+            res = self._generate_openai(prompt, model or "gpt-4o", max_tokens)
         elif self.provider == "groq":
-            return self._generate_groq(prompt, model or "llama3-8b-8192", max_tokens)
+            res = self._generate_groq(prompt, model or getattr(self, 'groq_model', 'llama3-8b-8192'), max_tokens)
         elif self.provider == "pollinations":
-            return self._generate_pollinations(prompt)
+            res = self._generate_pollinations(prompt)
         else:
-            return self._generate_template(prompt)
+            res = self._generate_template(prompt)
+
+        self.last_raw_response = res
+        return res
 
     def _generate_openai(self, prompt, model, max_tokens):
         if not self.openai_client:
-            return "Error: OpenAI client not initialized. Check your API key."
+            return "Error: OpenAI client not initialized."
         try:
             response = self.openai_client.chat.completions.create(
                 model=model,
                 messages=[
-                    {"role": "system", "content": "You are a creative social media manager for an AI influencer and faceless content creator."},
+                    {"role": "system", "content": "You are a creative social media manager. Respond with STRICT JSON only."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                response_format={ "type": "json_object" }
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -57,120 +66,141 @@ class ContentGenerator:
 
     def _generate_groq(self, prompt, model, max_tokens):
         if not self.groq_client:
-            return "Error: Groq client not initialized. Check your API key."
+            return "Error: Groq client not initialized."
         try:
             chat_completion = self.groq_client.chat.completions.create(
                 messages=[
-                    {"role": "system", "content": "You are a creative social media manager for an AI influencer and faceless content creator."},
+                    {"role": "system", "content": "You are a creative social media manager. Respond with STRICT JSON ONLY. No conversational text."},
                     {"role": "user", "content": prompt}
                 ],
                 model=model,
-                max_tokens=max_tokens
+                max_tokens=max_tokens,
+                response_format={ "type": "json_object" }
             )
             return chat_completion.choices[0].message.content
         except Exception as e:
-            return f"Groq Error: {e}"
+            # Fallback for models that don't support response_format
+            try:
+                chat_completion = self.groq_client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": "You are a creative social media manager. Respond with STRICT JSON ONLY. No conversational text."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    model=model,
+                    max_tokens=max_tokens
+                )
+                return chat_completion.choices[0].message.content
+            except Exception as e2:
+                return f"Groq Error: {e2}"
 
     def _generate_pollinations(self, prompt):
-        """
-        Uses Pollinations.ai text API for free content generation.
-        """
         try:
-            encoded_prompt = urllib.parse.quote(prompt)
+            encoded_prompt = urllib.parse.quote(prompt + " Respond with STRICT JSON ONLY.")
             url = f"https://text.pollinations.ai/{encoded_prompt}"
             response = requests.get(url)
-            if response.status_code == 200:
-                return response.text
-            else:
-                return f"Pollinations Error: {response.status_code}"
+            return response.text if response.status_code == 200 else f"Pollinations Error: {response.status_code}"
         except Exception as e:
-            return f"Pollinations Connection Error: {e}"
+            return f"Pollinations Error: {e}"
 
     def _generate_template(self, prompt):
-        """
-        Fallback template generator if no AI is available.
-        """
-        prompt_lower = prompt.lower()
-        if "ideas" in prompt_lower:
-            if "minecraft" in prompt_lower:
-                return "TITLE: Minecraft Parkour Brainrot\nHOOK: Why are you still watching this?\nANGLE: Fast-paced parkour with satisfying sounds.\nTRIGGER: Visual satisfaction\nCTA: Follow for more satisfying clips.\nMONETIZATION: Selling custom parkour maps.\nVISUALS: High-speed Minecraft parkour in the End."
-            elif "self-improvement" in prompt_lower or "discipline" in prompt_lower:
-                return "TITLE: The 5 AM Rule\nHOOK: 99% of people fail this.\nANGLE: Discipline over motivation.\nTRIGGER: FOMO (Fear Of Missing Out) on success.\nCTA: Type 'READY' if you're starting today.\nMONETIZATION: Coaching program.\nVISUALS: Dark cinematic shots of someone working out early."
-            elif "money" in prompt_lower or "side hustle" in prompt_lower:
-                return "TITLE: Student Side Hustle\nHOOK: Make $100/day using only your phone.\nANGLE: Easy entry for students.\nTRIGGER: Financial freedom\nCTA: Check the link in bio for the full tutorial.\nMONETIZATION: Affiliate marketing.\nVISUALS: Split screen with phone screen recording and aesthetic office."
-
-        if "script" in prompt_lower:
-            return "0:00 - VO: You've been lied to about success. TEXT: THE SUCCESS LIE. VISUAL: Cinematic slow motion of rain.\n0:05 - VO: It's not about talent, it's about discipline. TEXT: DISCIPLINE > TALENT. VISUAL: Fast cuts of intense training.\n0:15 - VO: Start today, not tomorrow. TEXT: START NOW. VISUAL: Motivational quote on dark background."
-
-        return "Enjoying the digital frontier! #AI #TechLife"
+        if "ideas" in prompt.lower():
+            return json.dumps({
+                "ideas": [
+                    {
+                        "title": "Minecraft Brainrot Survival",
+                        "hook": "I survived 100 days of brainrot Minecraft...",
+                        "angle": "First-person parkour while talking about Gen Alpha memes.",
+                        "trigger": "Curiosity/Confusion",
+                        "visuals": "High-speed Minecraft parkour with colorful shaders.",
+                        "cta": "Sub for more brainrot!",
+                        "monetization": "AdSense and merch."
+                    }
+                ]
+            })
+        return "Fallback content."
 
     def generate_ideas(self, niche, count=3):
+        self.last_parse_errors = []
         prompt = (
             f"Generate {count} viral content ideas for a faceless {niche} channel. "
-            "For each idea, provide exactly these fields:\n"
-            "TITLE: [Catchy title]\n"
-            "HOOK: [First 3-second hook]\n"
-            "ANGLE: [Unique video perspective]\n"
-            "TRIGGER: [Emotional trigger like FOMO, curiosity, anger, or joy]\n"
-            "CTA: [Call to action]\n"
-            "MONETIZATION: [How to make money from this video]\n"
-            "VISUALS: [Suggested visuals for Minecraft parkour or aesthetic b-roll]\n"
-            "---"
+            "Respond ONLY with a JSON object in this exact structure:\n"
+            "{\n"
+            "  \"ideas\": [\n"
+            "    {\n"
+            "      \"title\": \"\",\n"
+            "      \"hook\": \"\",\n"
+            "      \"angle\": \"\",\n"
+            "      \"trigger\": \"\",\n"
+            "      \"visuals\": \"\",\n"
+            "      \"cta\": \"\",\n"
+            "      \"monetization\": \"\"\n"
+            "    }\n"
+            "  ]\n"
+            "}"
         )
-        content = self.generate_content(prompt)
-        ideas_raw = content.split("---")
+        raw_res = self.generate_content(prompt)
+        return self._parse_ideas(raw_res, niche)
+
+    def _parse_ideas(self, raw_text, niche):
+        # 1. Try direct JSON load
+        try:
+            # Strip markdown code blocks if present
+            clean_text = re.sub(r'```json\s*|\s*```', '', raw_text).strip()
+            data = json.loads(clean_text)
+            if "ideas" in data and isinstance(data["ideas"], list):
+                return [self._validate_idea(i) for i in data["ideas"]]
+        except Exception as e:
+            self.last_parse_errors.append(f"JSON Parse Failed: {e}")
+
+        # 2. Try regex extraction if JSON fails
+        self.last_parse_errors.append("Attempting Regex Extraction...")
         ideas = []
-        for raw in ideas_raw:
-            if raw.strip():
-                idea = {}
-                for line in raw.strip().split('\n'):
-                    if ':' in line:
-                        key, val = line.split(':', 1)
-                        idea[key.strip().lower()] = val.strip()
-                if idea:
-                    ideas.append(idea)
+        # Find everything between { }
+        json_blocks = re.findall(r'\{[^{}]*\}', raw_text)
+        for block in json_blocks:
+            idea = {}
+            for field in ["title", "hook", "angle", "trigger", "visuals", "cta", "monetization"]:
+                match = re.search(f'"{field}"\\s*:\\s*"([^"]*)"', block, re.IGNORECASE)
+                if match:
+                    idea[field] = match.group(1)
+            if idea:
+                ideas.append(self._validate_idea(idea))
+
+        # 3. Fallback to template if nothing found
+        if not ideas:
+            self.last_parse_errors.append("Everything failed. Returning template.")
+            template_res = self._generate_template(f"ideas for {niche}")
+            return json.loads(template_res)["ideas"]
+
         return ideas
+
+    def _validate_idea(self, idea):
+        fields = ["title", "hook", "angle", "trigger", "visuals", "cta", "monetization"]
+        validated = {}
+        for f in fields:
+            val = idea.get(f, "").strip()
+            if not val or val.lower() == "none":
+                val = f"Creative {f.replace('_', ' ')}"
+            validated[f] = val
+        return validated
 
     def generate_script(self, idea_title, niche):
         prompt = (
-            f"Write a 15-45 second short-form video script for the idea: '{idea_title}' in the {niche} niche. "
-            "Format exactly like this for each segment:\n"
-            "TIMESTAMP - VO: [Voiceover text] TEXT: [On-screen text] VISUAL: [Visual direction]\n"
-            "Keep it fast-paced and high-retention."
+            f"Write a 15-45 second script for: '{idea_title}' in {niche}. "
+            "Format: TIMESTAMP - VO: [Text] TEXT: [On-screen] VISUAL: [Direction]"
         )
         return self.generate_content(prompt)
 
     def generate_metadata(self, idea_title, niche):
-        prompt = (
-            f"Generate captions and hashtags for a video titled '{idea_title}' in the {niche} niche.\n"
-            "TikTok Caption: [Text]\n"
-            "YouTube Shorts Title: [Text]\n"
-            "Instagram Reel Caption: [Text]\n"
-            "Hashtags: [#tag1 #tag2 ...]\n"
-            "Pinned Comment: [Text]\n"
-            "CTA: [Text]"
-        )
+        prompt = f"Generate TikTok/YT metadata for '{idea_title}' in {niche}."
         return self.generate_content(prompt)
 
     def generate_visual_prompts(self, visual_description):
-        prompt = (
-            f"Convert this visual description into 3 detailed AI image/video generation prompts (Minecraft-inspired, voxel, or cinematic b-roll, no copyrighted names): '{visual_description}'"
-        )
+        prompt = f"Create 3 AI image prompts for: {visual_description}"
         return self.generate_content(prompt)
 
     def generate_reel_plan(self, topic):
-        # Keeping for backward compatibility but using the new structure
         ideas = self.generate_ideas(topic, count=1)
-        if ideas:
-            idea = ideas[0]
-            script = self.generate_script(idea.get('title', topic), topic)
-            return {
-                "idea": idea.get('title', topic),
-                "script": script,
-                "visual": idea.get('visuals', topic)
-            }
-        return {"idea": topic, "script": "N/A", "visual": topic}
-
-if __name__ == "__main__":
-    gen = ContentGenerator(provider="pollinations")
-    print(f"Test Ideas: {gen.generate_ideas('Minecraft brainrot', count=2)}")
+        idea = ideas[0]
+        script = self.generate_script(idea['title'], topic)
+        return {"idea": idea['title'], "script": script, "visual": idea['visuals']}
