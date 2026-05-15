@@ -1,6 +1,11 @@
 import os
 import urllib.parse
+from PIL import Image
 from dotenv import load_dotenv
+
+# Fix Pillow/MoviePy compatibility issue
+if not hasattr(Image, "ANTIALIAS"):
+    Image.ANTIALIAS = Image.Resampling.LANCZOS
 
 load_dotenv()
 

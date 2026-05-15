@@ -112,7 +112,7 @@ class ContentGenerator:
                         "angle": "First-person parkour while talking about Gen Alpha memes.",
                         "trigger": "Curiosity/Confusion",
                         "visuals": "High-speed Minecraft parkour with colorful shaders.",
-                        "cta": "Sub for more brainrot!",
+                        "cta": "Follow for more brainrot!",
                         "monetization": "AdSense and merch."
                     }
                 ]
@@ -122,7 +122,7 @@ class ContentGenerator:
     def generate_ideas(self, niche, count=3):
         self.last_parse_errors = []
         prompt = (
-            f"Generate {count} viral content ideas for a faceless {niche} channel. "
+            f"Generate {count} viral Instagram Reel ideas for a faceless {niche} channel. "
             "Respond ONLY with a JSON object in this exact structure:\n"
             "{\n"
             "  \"ideas\": [\n"
@@ -186,14 +186,31 @@ class ContentGenerator:
 
     def generate_script(self, idea_title, niche):
         prompt = (
-            f"Write a 15-45 second script for: '{idea_title}' in {niche}. "
-            "Format: TIMESTAMP - VO: [Text] TEXT: [On-screen] VISUAL: [Direction]"
+            f"Write a 20-35 second Instagram Reel script for: '{idea_title}' in {niche}. "
+            "Format: TIMESTAMP - VO: [Text] TEXT: [On-screen] VISUAL: [Direction]. "
+            "Include a HUGE HOOK in the first 3 seconds."
         )
         return self.generate_content(prompt)
 
     def generate_metadata(self, idea_title, niche):
-        prompt = f"Generate TikTok/YT metadata for '{idea_title}' in {niche}."
+        prompt = (
+            f"Generate Instagram-specific metadata for a Reel titled '{idea_title}' in the {niche} niche.\n"
+            "Instagram Caption: [Text]\n"
+            "Hashtags: [#tag1 #tag2 ...]\n"
+            "Pinned Comment: [Text]\n"
+            "CTA: [Text]"
+        )
         return self.generate_content(prompt)
+
+    def extract_keywords(self, script_text):
+        """Extracts search terms for footage search."""
+        prompt = (
+            f"Extract 5 search terms (single words or short phrases) to find background footage for this script: {script_text}. "
+            "Focus on legal gaming/gameplay terms like 'parkour', 'minecraft', 'high energy', 'failure', 'success'. "
+            "Respond with a comma-separated list only."
+        )
+        res = self.generate_content(prompt)
+        return [k.strip() for k in res.split(',')]
 
     def generate_visual_prompts(self, visual_description):
         prompt = f"Create 3 AI image prompts for: {visual_description}"

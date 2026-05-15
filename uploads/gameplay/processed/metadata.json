@@ -1,0 +1,45 @@
+{
+    "micro_81374225.mp4": {
+        "source": "long_test.mp4",
+        "tags": [
+            "parkour"
+        ],
+        "duration": 2.0,
+        "path": "uploads/gameplay/processed/micro_81374225.mp4"
+    },
+    "micro_38fbc0c4.mp4": {
+        "source": "long_test.mp4",
+        "tags": [
+            "parkour"
+        ],
+        "duration": 2.0,
+        "path": "uploads/gameplay/processed/micro_38fbc0c4.mp4"
+    },
+    "micro_b51f0f0c.mp4": {
+        "source": "long_test.mp4",
+        "tags": [
+            "parkour"
+        ],
+        "duration": 2.0,
+        "path": "uploads/gameplay/processed/micro_b51f0f0c.mp4"
+    },
+    "micro_f9b6ec3d.mp4": {
+        "source": "long_test.mp4",
+        "tags": [
+            "parkour"
+        ],
+        "duration": 2.0,
+        "path": "uploads/gameplay/processed/micro_f9b6ec3d.mp4"
+    },
+    "micro_cf799062.mp4": {
+        "source": "long_test.mp4",
+        "tags": [
+            "parkour"
+        ],
+        "duration": 2.0,
+        "path": "uploads/gameplay/processed/micro_cf799062.mp4"
+    },
+    "processed_sources": [
+        "long_test.mp4"
+    ]
+}

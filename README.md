@@ -1,44 +1,55 @@
-# Faceless Content Automator Pro 🎬
+# 📸 InstaViral - Automated Instagram Reel Generator
 
-A complete "one-click" system for creating viral, high-quality faceless short-form videos (Minecraft reels, self-improvement, side hustles, etc.).
-
-## 🚀 One-Click Quickstart
-1. **Double-click `setup.bat`** (Installs everything, including video processing tools).
-2. **Double-click `run_app.bat`** (Opens the dashboard in your browser).
+Create viral faceless Instagram Reels (Minecraft, Self-Improvement, Side Hustles) without any editing or terminal knowledge. This tool automates the entire pipeline: **Scripting -> Voiceover -> Gameplay Selection -> Viral Editing -> Export.**
 
 ---
 
-## 🔥 Main Feature: Finished Reel Generator
-Generate a complete, edited 9:16 MP4 video ready for TikTok, YouTube Shorts, and Instagram.
+## 🚀 Beginner Quickstart (Windows)
 
-### How to generate a Reel:
-1. Go to the **🔥 Finished Reel Generator** tab.
-2. **Upload Gameplay:** Upload your own Minecraft parkour or aesthetic footage to the library.
-3. **Confirm Rights:** Check the box to confirm you have permission to use the footage.
-4. **Choose a Topic:** Enter a niche and topic (e.g., "Student Money Lessons").
-5. **Generate:** Click **🎬 GENERATE FINISHED REEL**.
-6. **Download:** The app will script the video, generate a voiceover, cut your gameplay to the right length, add captions, and export the final MP4.
-
----
-
-## 🛠 Other Features
-- **Niche Idea Generator:** Viral ideas specifically for faceless niches.
-- **Retention Script Writer:** Fast-paced scripts optimized for watch time.
-- **Content Tracker:** Manage your posting schedule with recommended IST times.
-- **Manual Tools:** Individual AI generators for images, text, and voiceovers.
+1. **Setup:** Double-click `setup.bat`. This will install everything automatically. (Wait until it says "Setup Successful").
+2. **Start:** Double-click `run_app.bat`. A browser window will open with the app.
+3. **Usage:**
+   - Go to the **📁 Gameplay Library** tab.
+   - Upload a long gameplay video (10+ mins).
+   - Click **⚙️ Process Gameplay Pack** (it will split it into viral 2-second clips).
+   - Go to the **🔥 One-Click Reel Workflow** tab.
+   - Click **📝 Generate Viral Script**.
+   - Click **🚀 GENERATE FINISHED REEL**.
 
 ---
 
-## 🔑 Settings & Providers
-- **AI Text:** Choose between Pollinations (Free), Groq (Fast), or OpenAI (Paid).
-- **Voiceover:** Uses `gTTS` (Online) or `pyttsx3` (Offline) for free. Supports premium keys as well.
-- **Gameplay Library:** Manage your clips in the `uploads/gameplay/` folder via the UI.
+## 🔑 Adding API Keys (Optional)
+
+You can use the app for **FREE** using the "Pollinations" engine. For higher quality, you can add keys in the **Sidebar** of the app or in the `.env` file:
+
+1. Open the folder and find the file named `.env`.
+2. Right-click it and "Open with Notepad".
+3. Paste your keys:
+   - `OPENAI_API_KEY`: Get from [OpenAI](https://platform.openai.com/)
+   - `GROQ_API_KEY`: Get from [Groq](https://console.groq.com/) (Fast & Free)
+   - `INSTAGRAM_USERNAME`: Your IG username for auto-posting.
 
 ---
+
+## 🛠 Requirements for Viral Captions
+
+To get the big, animated viral captions, you need **ImageMagick**:
+1. Download it here: [ImageMagick Download](https://imagemagick.org/script/download.php) (Windows Binary).
+2. **IMPORTANT:** During installation, you MUST check the box that says **"Install legacy utilities (e.g. convert)"**.
+
+---
+
+## 📁 Project Structure
+
+- `app.py`: The main clickable browser UI.
+- `gameplay_processor.py`: Splits long videos into micro-clips for the AI to pick.
+- `video_editor.py`: Assembles the final 9:16 Reel with zooms and captions.
+- `content_gen.py`: Writes the scripts using AI (GPT-4 or Groq).
+- `library_manager.py`: Manages your collection of gameplay footage.
 
 ## ⚖️ Copyright & Safety
-- **Legal Footage Only:** Use your own gameplay or royalty-free clips. Do not download copyrighted videos.
-- **Account Safety:** Automated posting (optional via sidebar) carries risks of account blocks. Use responsibly.
+- **Footage:** Use only royalty-free footage or gameplay you recorded yourself.
+- **Responsibility:** Use automation ethically. Do not spam.
 
 ## 📝 License
-MIT - Start your faceless content journey today!
+MIT - Build your Instagram empire!
