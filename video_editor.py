@@ -5,27 +5,24 @@ from moviepy.video.fx.all import crop, resize
 import moviepy.video.fx.all as vfx
 
 class ReelEditor:
-    def __init__(self, output_dir="exports/final_reels"):
+    def __init__(self, output_dir="exports/instagram_reels"):
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
         self.width = 1080
         self.height = 1920
 
-    def create_reel(self, gameplay_paths, vo_path, script_data, output_filename="final_video.mp4"):
+    def create_reel(self, gameplay_paths, vo_path, script_data, output_filename="final_reel.mp4"):
         """
-        Assembles a finished reel.
-        script_data: list of dicts with {'start': 0, 'end': 2, 'text': '...', 'vo': '...'}
+        Assembles a finished Instagram Reel.
         """
         audio = AudioFileClip(vo_path)
         duration = audio.duration
 
-        clips = []
-        current_time = 0
+        opened_clips = [] # Keep track to close later
 
         # 1. Process Gameplay Clips
         if not gameplay_paths:
-            # Fallback to a color clip if no gameplay
-            gameplay_clips = [ColorClip(size=(self.width, self.height), color=(0,0,0)).set_duration(duration)]
+            final_video = ColorClip(size=(self.width, self.height), color=(0,0,0)).set_duration(duration)
         else:
             gameplay_clips = []
             random.shuffle(gameplay_paths)
@@ -34,28 +31,28 @@ class ReelEditor:
             while temp_duration < duration:
                 path = gameplay_paths[idx % len(gameplay_paths)]
                 clip = VideoFileClip(path)
+                opened_clips.append(clip)
 
-                # Resize and crop to 9:16
                 clip = self._format_to_916(clip)
 
-                # Pacing: cut every 2-3 seconds or based on script
-                sub_duration = min(3, duration - temp_duration)
+                # Viral pacing: quick cuts every 1.5 - 2.5 seconds
+                sub_duration = min(random.uniform(1.5, 2.5), duration - temp_duration)
                 if clip.duration > sub_duration:
                     start_t = random.uniform(0, clip.duration - sub_duration)
                     clip = clip.subclip(start_t, start_t + sub_duration)
 
-                # Add zoom effect occasionally
-                if random.random() > 0.5:
-                    clip = self._apply_zoom(clip)
+                # Zoom/Shake effects
+                clip = self._apply_viral_effects(clip)
 
                 gameplay_clips.append(clip)
                 temp_duration += clip.duration
                 idx += 1
 
-        final_video = concatenate_videoclips(gameplay_clips).set_duration(duration)
+            final_video = concatenate_videoclips(gameplay_clips).set_duration(duration)
+
         final_video = final_video.set_audio(audio)
 
-        # 2. Add Captions (Fallback to basic subtitles if ImageMagick fails)
+        # 2. Add Captions
         caption_clips = []
         try:
             for segment in script_data:
@@ -64,31 +61,35 @@ class ReelEditor:
                 text = segment.get('text', '')
 
                 if text:
-                    # Split text into chunks of 3-5 words
+                    # Viral style: 3 words per line, large, bold
                     words = text.split()
-                    chunk_size = 4
+                    chunk_size = 3
                     for i in range(0, len(words), chunk_size):
                         chunk = " ".join(words[i:i+chunk_size]).upper()
                         chunk_duration = (end - start) / (len(words) / chunk_size)
                         chunk_start = start + (i / chunk_size) * chunk_duration
 
+                        # Use huge font for the first 3 seconds (The Hook)
+                        is_hook = chunk_start < 3
+                        fsize = 100 if is_hook else 75
+
                         txt_clip = TextClip(
                             chunk,
-                            fontsize=70,
-                            color='yellow',
+                            fontsize=fsize,
+                            color='white',
                             font='Arial-Bold',
                             stroke_color='black',
-                            stroke_width=2,
+                            stroke_width=3,
                             method='caption',
-                            size=(self.width * 0.8, None)
-                        ).set_start(chunk_start).set_duration(chunk_duration).set_position(('center', 1400))
+                            size=(self.width * 0.9, None)
+                        ).set_start(chunk_start).set_duration(chunk_duration).set_position(('center', 1000))
 
-                        # Pop animation
-                        txt_clip = txt_clip.fx(vfx.resize, lambda t: 1 + 0.1 * (t / chunk_duration) if t < 0.1 else 1)
+                        # Scale/Pop animation
+                        txt_clip = txt_clip.fx(vfx.resize, lambda t: 1 + 0.2 * (t / chunk_duration) if t < 0.1 else 1)
 
                         caption_clips.append(txt_clip)
         except Exception as e:
-            print(f"Caption generation failed (likely ImageMagick): {e}. Proceeding without captions.")
+            print(f"Caption error: {e}")
 
         # Combine
         result = CompositeVideoClip([final_video] + caption_clips, size=(self.width, self.height))
@@ -96,28 +97,30 @@ class ReelEditor:
         output_path = os.path.join(self.output_dir, output_filename)
         result.write_videofile(output_path, fps=24, codec="libx264", audio_codec="aac")
 
+        # Cleanup
+        result.close()
+        final_video.close()
+        audio.close()
+        for c in opened_clips:
+            c.close()
+        for c in caption_clips:
+            c.close()
+
         return output_path
 
     def _format_to_916(self, clip):
-        """Resizes and crops a clip to 1080x1920."""
         target_ratio = 1080 / 1920
         clip_ratio = clip.w / clip.h
-
         if clip_ratio > target_ratio:
-            # Clip is wider than target
             new_w = clip.h * target_ratio
             clip = crop(clip, x_center=clip.w/2, width=new_w)
         else:
-            # Clip is taller than target
             new_h = clip.w / target_ratio
             clip = crop(clip, y_center=clip.h/2, height=new_h)
-
         return clip.resize(width=1080)
 
-    def _apply_zoom(self, clip):
-        """Applies a subtle zoom-in effect."""
-        return clip.fx(vfx.resize, lambda t: 1 + 0.05 * t)
-
-if __name__ == "__main__":
-    # Test stub
-    print("ReelEditor module loaded.")
+    def _apply_viral_effects(self, clip):
+        # Randomly apply zoom or slight shake
+        if random.random() > 0.5:
+            return clip.fx(vfx.resize, lambda t: 1 + 0.08 * t)
+        return clip

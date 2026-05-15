@@ -1,44 +1,36 @@
-# Faceless Content Automator Pro 🎬
+# Instagram Reel Automator 📸
 
-A complete "one-click" system for creating viral, high-quality faceless short-form videos (Minecraft reels, self-improvement, side hustles, etc.).
+Generate viral, high-quality Instagram Reels with one click using legal AI-powered footage sourcing and assembly.
 
-## 🚀 One-Click Quickstart
-1. **Double-click `setup.bat`** (Installs everything, including video processing tools).
-2. **Double-click `run_app.bat`** (Opens the dashboard in your browser).
+## 🚀 Quickstart
+1. **Double-click `setup.bat`** (First time only).
+2. **Double-click `run_app.bat`**.
 
----
+## 🔥 Main Feature: One-Click Reel Pipeline
+The app handles the entire process:
+**Scripting -> Footage Search -> Voiceover -> viral Editing -> Export.**
 
-## 🔥 Main Feature: Finished Reel Generator
-Generate a complete, edited 9:16 MP4 video ready for TikTok, YouTube Shorts, and Instagram.
+### How to use:
+1. Open the app and go to the **🔥 Generate Instagram Reel** tab.
+2. Enter your **Pixabay/Pexels API keys** in the sidebar (Optional but recommended for auto-footage).
+3. Select your niche and enter a specific topic.
+4. Click **🚀 GENERATE FINISHED INSTAGRAM REEL**.
+5. Download your Reel and copy the generated caption/hashtags.
 
-### How to generate a Reel:
-1. Go to the **🔥 Finished Reel Generator** tab.
-2. **Upload Gameplay:** Upload your own Minecraft parkour or aesthetic footage to the library.
-3. **Confirm Rights:** Check the box to confirm you have permission to use the footage.
-4. **Choose a Topic:** Enter a niche and topic (e.g., "Student Money Lessons").
-5. **Generate:** Click **🎬 GENERATE FINISHED REEL**.
-6. **Download:** The app will script the video, generate a voiceover, cut your gameplay to the right length, add captions, and export the final MP4.
+## 🛠 Features
+- **Legal Footage Search:** Automatically finds clips from Pixabay and Pexels based on your script.
+- **Viral Caption Engine:** Big bold captions with pop animations and huge hooks.
+- **Gameplay Library:** Upload and tag your own clips to use as background footage.
+- **Instagram-First:** Metadata, captions, and hashtags optimized for the Instagram algorithm.
 
----
-
-## 🛠 Other Features
-- **Niche Idea Generator:** Viral ideas specifically for faceless niches.
-- **Retention Script Writer:** Fast-paced scripts optimized for watch time.
-- **Content Tracker:** Manage your posting schedule with recommended IST times.
-- **Manual Tools:** Individual AI generators for images, text, and voiceovers.
-
----
-
-## 🔑 Settings & Providers
-- **AI Text:** Choose between Pollinations (Free), Groq (Fast), or OpenAI (Paid).
-- **Voiceover:** Uses `gTTS` (Online) or `pyttsx3` (Offline) for free. Supports premium keys as well.
-- **Gameplay Library:** Manage your clips in the `uploads/gameplay/` folder via the UI.
-
----
+## 🔑 Configuration
+- **API Keys:** Add your keys for Pixabay, Pexels, Groq, or OpenAI in the sidebar or `.env` file.
+- **Free Mode:** Works out of the box with Pollinations.ai and manual gameplay uploads.
 
 ## ⚖️ Copyright & Safety
-- **Legal Footage Only:** Use your own gameplay or royalty-free clips. Do not download copyrighted videos.
-- **Account Safety:** Automated posting (optional via sidebar) carries risks of account blocks. Use responsibly.
+- Use only royalty-free footage or footage you own.
+- Do not scrape from YouTube/TikTok.
+- Automation carries risks; post responsibly.
 
 ## 📝 License
-MIT - Start your faceless content journey today!
+MIT - Build your Instagram empire!
