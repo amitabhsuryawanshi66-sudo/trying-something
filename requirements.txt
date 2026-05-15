@@ -9,5 +9,5 @@ imageio-ffmpeg
 gTTS
 pyttsx3
 pandas
-Pillow<10.0.0
+Pillow>=10.0.0
 yt-dlp

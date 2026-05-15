@@ -1,5 +1,6 @@
 import os
 import random
+import datetime
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 
@@ -159,5 +160,3 @@ class ReelEditor:
         td = datetime.timedelta(seconds=seconds)
         # Simplified formatting
         return str(td).replace('.', ',')[:11]
-
-import datetime
