@@ -55,6 +55,41 @@ class VideoGenerator:
         except Exception as e:
             return f"Error in free video generation: {e}"
 
+class VoiceoverGenerator:
+    def __init__(self, provider="gtts"):
+        self.provider = provider.lower()
+
+    def generate_vo(self, text, output_path="vo.mp3"):
+        if self.provider == "gtts":
+            return self._generate_gtts(text, output_path)
+        elif self.provider == "pyttsx3":
+            return self._generate_pyttsx3(text, output_path)
+        else:
+            # Fallback to gtts
+            return self._generate_gtts(text, output_path)
+
+    def _generate_gtts(self, text, output_path):
+        try:
+            from gtts import gTTS
+            tts = gTTS(text=text, lang='en')
+            tts.save(output_path)
+            return output_path
+        except Exception as e:
+            print(f"gTTS failed: {e}. Falling back to pyttsx3.")
+            return self._generate_pyttsx3(text, output_path)
+
+    def _generate_pyttsx3(self, text, output_path):
+        try:
+            import pyttsx3
+            engine = pyttsx3.init()
+            # On some systems, pyttsx3 save_to_file might be tricky
+            # We'll try it
+            engine.save_to_file(text, output_path)
+            engine.runAndWait()
+            return output_path
+        except Exception as e:
+            return f"Error in pyttsx3: {e}"
+
 if __name__ == "__main__":
-    gen = VideoGenerator()
-    print(f"Free video URL: {gen.generate_video('A futuristic city at sunset')}")
+    vo = VoiceoverGenerator()
+    print(f"VO generated at: {vo.generate_vo('Hello world')}")

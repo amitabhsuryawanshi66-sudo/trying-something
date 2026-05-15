@@ -1,40 +1,44 @@
-# Faceless Content Automator 🎬
+# Faceless Content Automator Pro 🎬
 
-A beginner-friendly, "one-click" system to generate and automate faceless short-form videos (Minecraft brainrot, self-improvement, side hustles, etc.).
+A complete "one-click" system for creating viral, high-quality faceless short-form videos (Minecraft reels, self-improvement, side hustles, etc.).
 
 ## 🚀 One-Click Quickstart
-1. **Double-click `setup.bat`** (Installs everything for you).
-2. **Double-click `run_app.bat`** (Opens the app in your browser).
+1. **Double-click `setup.bat`** (Installs everything, including video processing tools).
+2. **Double-click `run_app.bat`** (Opens the dashboard in your browser).
 
 ---
 
-## 🛠 Features
-- **Niche Idea Generator:** Viral ideas for Minecraft, discipline, AI tools, and more.
-- **Retention Script Writer:** 15-45s scripts with VO and on-screen text directions.
-- **Visual Prompt Creator:** Ready-to-use prompts for AI video generators.
-- **Content Tracker:** A built-in dashboard to track your status (Idea -> Posted).
-- **Auto-Post:** Upload generated clips directly to Instagram Reels.
+## 🔥 Main Feature: Finished Reel Generator
+Generate a complete, edited 9:16 MP4 video ready for TikTok, YouTube Shorts, and Instagram.
 
-## 💡 How to use (No coding needed)
-1. Open the app via `run_app.bat`.
-2. Go to the **Generator Dashboard** tab.
-3. Select your niche and click **Generate Ideas**.
-4. Click **Select & Generate Script** for an idea you like.
-5. In the **Content Package** section, you can:
-   - Export your brief as Markdown or CSV.
-   - Use the **One-Click Visual & Post** button to generate a clip and upload it to IG.
+### How to generate a Reel:
+1. Go to the **🔥 Finished Reel Generator** tab.
+2. **Upload Gameplay:** Upload your own Minecraft parkour or aesthetic footage to the library.
+3. **Confirm Rights:** Check the box to confirm you have permission to use the footage.
+4. **Choose a Topic:** Enter a niche and topic (e.g., "Student Money Lessons").
+5. **Generate:** Click **🎬 GENERATE FINISHED REEL**.
+6. **Download:** The app will script the video, generate a voiceover, cut your gameplay to the right length, add captions, and export the final MP4.
 
 ---
 
-## 🔑 Settings (Optional)
-- **Free Mode:** Default. Uses Pollinations.ai. No setup needed!
-- **Groq/OpenAI:** For faster/smarter results, enter your API keys in the sidebar.
-- **Instagram:** Enter your username/password in the sidebar to use the auto-post feature.
+## 🛠 Other Features
+- **Niche Idea Generator:** Viral ideas specifically for faceless niches.
+- **Retention Script Writer:** Fast-paced scripts optimized for watch time.
+- **Content Tracker:** Manage your posting schedule with recommended IST times.
+- **Manual Tools:** Individual AI generators for images, text, and voiceovers.
 
 ---
 
-## ⚠️ Important
-Social media automation can lead to account bans if overused. Moderate your posting frequency and use this tool responsibly.
+## 🔑 Settings & Providers
+- **AI Text:** Choose between Pollinations (Free), Groq (Fast), or OpenAI (Paid).
+- **Voiceover:** Uses `gTTS` (Online) or `pyttsx3` (Offline) for free. Supports premium keys as well.
+- **Gameplay Library:** Manage your clips in the `uploads/gameplay/` folder via the UI.
+
+---
+
+## ⚖️ Copyright & Safety
+- **Legal Footage Only:** Use your own gameplay or royalty-free clips. Do not download copyrighted videos.
+- **Account Safety:** Automated posting (optional via sidebar) carries risks of account blocks. Use responsibly.
 
 ## 📝 License
-MIT - Build your faceless empire!
+MIT - Start your faceless content journey today!
