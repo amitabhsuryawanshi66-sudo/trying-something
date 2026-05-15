@@ -1,48 +1,44 @@
-# AI Influencer Automation System 🤖
+# Faceless Content Automator Pro 🎬
 
-This project is a beginner-friendly, modular Python system for automating an AI influencer's workflow.
+A complete "one-click" system for creating viral, high-quality faceless short-form videos (Minecraft reels, self-improvement, side hustles, etc.).
 
-## 🌟 New Feature: Idea-to-Reel Automation
-You can now enter a simple topic (e.g., "Why I love coding") and the system will:
-1. **Brainstorm** a unique Reel idea.
-2. **Write** a script for the post.
-3. **Generate** a background video.
-4. **Post** it directly to your Instagram account.
+## 🚀 One-Click Quickstart
+1. **Double-click `setup.bat`** (Installs everything, including video processing tools).
+2. **Double-click `run_app.bat`** (Opens the dashboard in your browser).
 
 ---
 
-## 🚀 Beginner Setup Guide (No coding required!)
+## 🔥 Main Feature: Finished Reel Generator
+Generate a complete, edited 9:16 MP4 video ready for TikTok, YouTube Shorts, and Instagram.
 
-### 1. Prerequisites
-- You need **Python** installed. Download from [python.org](https://www.python.org/downloads/). (Check "Add Python to PATH").
-
-### 2. Installation
-1. Download or clone this repository.
-2. **Double-click `setup.bat`**. This installs everything needed (Streamlit, Instagrapi, etc.).
-
-### 3. Running the App
-1. **Double-click `run_app.bat`**.
-2. The browser UI will open.
-3. Enter your **Instagram Username** and **Password** in the sidebar if you want to use the automated posting feature.
-4. Go to the **"Full Automation"** tab, enter a topic, and click **"Start Full Automation"**.
-
-### 4. Configuration (API Keys)
-- **Free Mode:** Default. No keys needed. Uses Pollinations.ai for everything.
-- **Premium Mode:** Add your `OPENAI_API_KEY` to the `.env` file to use DALL-E 3 and GPT-4o.
+### How to generate a Reel:
+1. Go to the **🔥 Finished Reel Generator** tab.
+2. **Upload Gameplay:** Upload your own Minecraft parkour or aesthetic footage to the library.
+3. **Confirm Rights:** Check the box to confirm you have permission to use the footage.
+4. **Choose a Topic:** Enter a niche and topic (e.g., "Student Money Lessons").
+5. **Generate:** Click **🎬 GENERATE FINISHED REEL**.
+6. **Download:** The app will script the video, generate a voiceover, cut your gameplay to the right length, add captions, and export the final MP4.
 
 ---
 
-## 🛠 Project Structure
-- `app.py`: Streamlit Web UI.
-- `automation.py`: Orchestrator for the "Idea to Post" pipeline.
-- `social_manager.py`: Handles Instagram login and Reel uploads via `instagrapi`.
-- `video_gen.py`: Generates videos using AI.
-- `image_gen.py` / `content_gen.py`: Core generators.
+## 🛠 Other Features
+- **Niche Idea Generator:** Viral ideas specifically for faceless niches.
+- **Retention Script Writer:** Fast-paced scripts optimized for watch time.
+- **Content Tracker:** Manage your posting schedule with recommended IST times.
+- **Manual Tools:** Individual AI generators for images, text, and voiceovers.
 
 ---
 
-## ⚠️ Important Note
-Automating social media accounts can sometimes lead to temporary blocks or bans if used excessively. Use this tool responsibly and moderate the frequency of your automated posts.
+## 🔑 Settings & Providers
+- **AI Text:** Choose between Pollinations (Free), Groq (Fast), or OpenAI (Paid).
+- **Voiceover:** Uses `gTTS` (Online) or `pyttsx3` (Offline) for free. Supports premium keys as well.
+- **Gameplay Library:** Manage your clips in the `uploads/gameplay/` folder via the UI.
+
+---
+
+## ⚖️ Copyright & Safety
+- **Legal Footage Only:** Use your own gameplay or royalty-free clips. Do not download copyrighted videos.
+- **Account Safety:** Automated posting (optional via sidebar) carries risks of account blocks. Use responsibly.
 
 ## 📝 License
-Open-source. Adapt it for your AI influencer journey!
+MIT - Start your faceless content journey today!
