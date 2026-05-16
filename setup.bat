@@ -42,6 +42,9 @@ if %errorlevel% neq 0 (
 
 echo Installing all requirements...
 python -m pip install -r requirements.txt
+
+echo.
+echo NOTE: edge-tts and pydub have been added for high-quality voiceovers.
 if %errorlevel% neq 0 (
     echo [ERROR] Failed to install requirements.
     pause
