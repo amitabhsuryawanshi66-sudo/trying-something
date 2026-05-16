@@ -14,3 +14,6 @@ yt-dlp
 edge-tts>=6.1.0
 pydub
 audioop-lts; python_version >= "3.13"
+tornado>=6.3.3,<7
+certifi>=2024.0.0
+numpy
